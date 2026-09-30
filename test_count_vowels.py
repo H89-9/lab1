@@ -1,5 +1,3 @@
-"""Тесты к задаче 1: подсчёт гласных."""
-
 import unittest
 
 from grader_contracts.python_basics import TextInput
