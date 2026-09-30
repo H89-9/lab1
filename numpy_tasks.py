@@ -1,5 +1,3 @@
-"""Заготовки задач на NumPy."""
-
 import numpy as np
 from grader_contracts.numpy_tasks import (
     BinarizeInput, ChessInput, EllipseInput, MatrixInput, MatrixStatistics,
