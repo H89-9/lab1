@@ -22,31 +22,27 @@ def count_one_bits(data: PositiveIntegerInput) -> int:
 
 def multiplicative_persistence(data: PositiveIntegerInput) -> int:
     number = data.value
-    steps = 0
+    count = 0
 
     while number >= 10:
-        product = 1
+        result = 1
         for digit in str(number):
-            product *= int(digit)
-        number = product
-        steps += 1
+            result *= int(digit)
+        number = result
+        count += 1
 
-    return steps
+    return count
 
 
 def mse(data: VectorPairInput) -> float:
-    predicted, expected = data.predicted, data.expected
+    predicted = data.predicted
+    expected = data.expected
 
-    if len(predicted) != len(expected):
-        raise ValueError("Vectors must have the same length")
-    if len(predicted) == 0:
-        raise ValueError("Vectors must not be empty")
+    total = 0
+    for i in range(len(predicted)):
+        total += (predicted[i] - expected[i]) ** 2
 
-    error_sum = 0
-    for predicted_value, expected_value in zip(predicted, expected):
-        error_sum += (predicted_value - expected_value) ** 2
-
-    return error_sum / len(predicted)
+    return total / len(predicted)
 
 
 def prime_factorization(data: PositiveIntegerInput) -> str:
@@ -55,26 +51,24 @@ def prime_factorization(data: PositiveIntegerInput) -> str:
     if number == 1:
         return "(1)"
 
-    result = []
+    answer = ""
     divisor = 2
 
-    while divisor * divisor <= number:
+    while number > 1:
         power = 0
+
         while number % divisor == 0:
             number //= divisor
             power += 1
 
         if power == 1:
-            result.append(f"({divisor})")
+            answer += f"({divisor})"
         elif power > 1:
-            result.append(f"({divisor}**{power})")
+            answer += f"({divisor}**{power})"
 
         divisor += 1
 
-    if number > 1:
-        result.append(f"({number})")
-
-    return "".join(result)
+    return answer
 
 
 def pyramid(data: PositiveIntegerInput) -> int | str:
@@ -88,23 +82,22 @@ def pyramid(data: PositiveIntegerInput) -> int | str:
 
     if total == cube_count:
         return level
+
     return "It is impossible"
 
 
 def is_balanced_number(data: PositiveIntegerInput) -> bool:
     digits = str(data.value)
-    length = len(digits)
+    middle = len(digits) // 2
 
-    if length % 2 == 0:
-        half = length // 2
-        left = digits[:half - 1]
-        right = digits[half + 1:]
+    if len(digits) % 2 == 0:
+        left = digits[:middle - 1]
+        right = digits[middle + 1:]
     else:
-        half = length // 2
-        left = digits[:half]
-        right = digits[half + 1:]
+        left = digits[:middle]
+        right = digits[middle + 1:]
 
-    left_sum = sum(int(digit) for digit in left)
-    right_sum = sum(int(digit) for digit in right)
+    left_sum = sum(int(x) for x in left)
+    right_sum = sum(int(x) for x in right)
 
     return left_sum == right_sum
