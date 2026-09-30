@@ -9,10 +9,6 @@ from grader_contracts.numpy_tasks import (
 def sum_prod(data: MatrixVectorBatchInput) -> np.ndarray:
     matrices = np.asarray(data.matrices)
     vectors = np.asarray(data.vectors)
-
-    if vectors.ndim == 2:
-        vectors = vectors[..., np.newaxis]
-
     products = np.matmul(matrices, vectors)
     return np.sum(products, axis=0)
 
@@ -24,141 +20,140 @@ def binarize(data: BinarizeInput) -> np.ndarray:
 
 def unique_rows(data: MatrixInput) -> list[list[float]]:
     matrix = np.asarray(data.matrix)
-    return [np.unique(row).tolist() for row in matrix]
+    result = []
+
+    for row in matrix:
+        result.append(np.unique(row).tolist())
+
+    return result
 
 
 def unique_columns(data: MatrixInput) -> list[list[float]]:
     matrix = np.asarray(data.matrix)
-    return [np.unique(column).tolist() for column in matrix.T]
+    result = []
+
+    for column in matrix.T:
+        result.append(np.unique(column).tolist())
+
+    return result
 
 
 def matrix_statistics(data: RandomMatrixInput) -> MatrixStatistics:
-    rows, columns, mean, std, seed = data.rows, data.columns, data.mean, data.std, data.seed
+    rng = np.random.default_rng(data.seed)
+    matrix = rng.normal(data.mean, data.std, (data.rows, data.columns))
 
-    rng = np.random.default_rng(seed)
-    matrix = rng.normal(mean, std, size=(rows, columns))
+    row_means = np.mean(matrix, axis=1)
+    column_means = np.mean(matrix, axis=0)
+    row_variances = np.var(matrix, axis=1)
+    column_variances = np.var(matrix, axis=0)
 
     return MatrixStatistics(
-        matrix=matrix,
-        row_means=np.mean(matrix, axis=1),
-        column_means=np.mean(matrix, axis=0),
-        row_variances=np.var(matrix, axis=1),
-        column_variances=np.var(matrix, axis=0),
+        matrix,
+        row_means,
+        column_means,
+        row_variances,
+        column_variances,
     )
 
 
 def plot_matrix_histograms(matrix: np.ndarray) -> None:
     import matplotlib.pyplot as plt
 
-    matrix = np.asarray(matrix)
-
-    for row_index, row in enumerate(matrix):
+    for row in matrix:
         plt.figure()
         plt.hist(row)
-        plt.title(f"Row {row_index}")
 
-    for column_index, column in enumerate(matrix.T):
+    for column in matrix.T:
         plt.figure()
         plt.hist(column)
-        plt.title(f"Column {column_index}")
 
     plt.show()
 
 
 def chess(data: ChessInput) -> np.ndarray:
-    rows, columns, first, second = data.rows, data.columns, data.first, data.second
-    indices = np.indices((rows, columns))
-    return np.where((indices[0] + indices[1]) % 2 == 0, first, second)
+    result = np.empty((data.rows, data.columns))
+
+    for i in range(data.rows):
+        for j in range(data.columns):
+            if (i + j) % 2 == 0:
+                result[i, j] = data.first
+            else:
+                result[i, j] = data.second
+
+    return result
 
 
 def draw_rectangle(data: RectangleInput) -> np.ndarray:
-    width, height = data.width, data.height
-    image_height, image_width = data.image_height, data.image_width
-    shape_color, background_color = data.shape_color, data.background_color
+    image = np.empty((data.image_height, data.image_width, 3), dtype=np.uint8)
+    image[:] = data.background_color
 
-    image = np.empty((image_height, image_width, 3), dtype=np.uint8)
-    image[:] = background_color
+    x = (data.image_width - data.width) // 2
+    y = (data.image_height - data.height) // 2
 
-    start_x = (image_width - width) // 2
-    start_y = (image_height - height) // 2
-    image[start_y:start_y + height, start_x:start_x + width] = shape_color
+    image[y:y + data.height, x:x + data.width] = data.shape_color
 
     return image
 
 
 def draw_ellipse(data: EllipseInput) -> np.ndarray:
-    semi_axis_x, semi_axis_y = data.semi_axis_x, data.semi_axis_y
-    image_height, image_width = data.image_height, data.image_width
-    shape_color, background_color = data.shape_color, data.background_color
+    image = np.empty((data.image_height, data.image_width, 3), dtype=np.uint8)
+    image[:] = data.background_color
 
-    image = np.empty((image_height, image_width, 3), dtype=np.uint8)
-    image[:] = background_color
+    center_x = data.image_width // 2
+    center_y = data.image_height // 2
 
-    center_x = image_width // 2
-    center_y = image_height // 2
+    y, x = np.ogrid[:data.image_height, :data.image_width]
 
-    y, x = np.ogrid[:image_height, :image_width]
     mask = (
-        ((x - center_x) ** 2) / (semi_axis_x ** 2)
-        + ((y - center_y) ** 2) / (semi_axis_y ** 2)
+        ((x - center_x) ** 2) / data.semi_axis_x ** 2
+        + ((y - center_y) ** 2) / data.semi_axis_y ** 2
         <= 1
     )
-    image[mask] = shape_color
+
+    image[mask] = data.shape_color
 
     return image
 
 
 def analyze_time_series(data: TimeSeriesInput) -> TimeSeriesStatistics:
     values = np.asarray(data.values, dtype=float)
-    window = data.window
 
-    if window <= 0 or window > len(values):
-        raise ValueError("Window must be between 1 and the series length")
+    maximums = []
+    minimums = []
 
-    local_maxima = np.where(
-        (values[1:-1] > values[:-2]) & (values[1:-1] > values[2:])
-    )[0] + 1
+    for i in range(1, len(values) - 1):
+        if values[i] > values[i - 1] and values[i] > values[i + 1]:
+            maximums.append(i)
 
-    local_minima = np.where(
-        (values[1:-1] < values[:-2]) & (values[1:-1] < values[2:])
-    )[0] + 1
+        if values[i] < values[i - 1] and values[i] < values[i + 1]:
+            minimums.append(i)
 
-    moving_average = np.convolve(
-        values,
-        np.ones(window) / window,
-        mode="valid",
-    )
+    moving_average = []
+
+    for i in range(len(values) - data.window + 1):
+        moving_average.append(np.mean(values[i:i + data.window]))
 
     return TimeSeriesStatistics(
-        mean=float(np.mean(values)),
-        variance=float(np.var(values)),
-        std=float(np.std(values)),
-        local_maxima_indices=local_maxima,
-        local_minima_indices=local_minima,
-        moving_average=moving_average,
+        float(np.mean(values)),
+        float(np.var(values)),
+        float(np.std(values)),
+        np.array(maximums),
+        np.array(minimums),
+        np.array(moving_average),
     )
 
 
 def one_hot(data: OneHotInput) -> np.ndarray:
     labels = np.asarray(data.labels, dtype=int)
 
-    if labels.ndim != 1:
-        raise ValueError("Labels must be one-dimensional")
-    if np.any(labels < 0):
-        raise ValueError("Labels must be non-negative")
-
     if data.class_count is None:
-        class_count = int(labels.max()) + 1 if labels.size else 0
+        class_count = int(np.max(labels)) + 1
     else:
         class_count = data.class_count
 
-    if class_count < 0:
-        raise ValueError("Class count must be non-negative")
-    if labels.size and labels.max() >= class_count:
-        raise ValueError("Class count is too small for the labels")
+    result = np.zeros((len(labels), class_count), dtype=int)
 
-    result = np.zeros((labels.size, class_count), dtype=int)
-    if labels.size:
-        result[np.arange(labels.size), labels] = 1
+    for i in range(len(labels)):
+        result[i, labels[i]] = 1
 
     return result
