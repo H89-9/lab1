@@ -5,7 +5,11 @@ from grader_contracts.python_basics import PositiveIntegerInput, TextInput, Vect
 
 def count_vowels(data: TextInput) -> int:
     text = data.value
-    raise NotImplementedError  # TODO
+    count = 0
+    for letter in text.lower():
+        if letter in "aeiou":
+            count += 1
+    return count
 
 
 def has_unique_characters(data: TextInput) -> bool:
