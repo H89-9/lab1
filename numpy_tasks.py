@@ -28,21 +28,33 @@ def unique_rows(data: MatrixInput) -> list[list[float]]:
 
     for row in matrix:
         result.append(np.unique(row).tolist())
-
     return result
+
 def unique_columns(data: MatrixInput) -> list[list[float]]:
     matrix = data.matrix
     result = []
 
     for column in matrix.T:
         result.append(np.unique(column).tolist())
-
     return result
 
 
 def matrix_statistics(data: RandomMatrixInput) -> MatrixStatistics:
     rows, columns, mean, std, seed = data.rows, data.columns, data.mean, data.std, data.seed
-    raise NotImplementedError  # TODO
+    rng = np.random.default_rng(seed)
+    matrix = rng.normal(mean, std, size=(rows, columns))
+    row_means = np.mean(matrix, axis=1)
+    column_means = np.mean(matrix, axis=0)
+    row_variances = np.var(matrix, axis=1)
+    column_variances = np.var(matrix, axis=0)
+
+    return MatrixStatistics(
+        matrix,
+        row_means,
+        column_means,
+        row_variances,
+        column_variances
+    )
 
 
 def chess(data: ChessInput) -> np.ndarray:
