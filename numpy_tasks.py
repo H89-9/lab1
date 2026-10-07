@@ -108,7 +108,29 @@ def draw_ellipse(data: EllipseInput) -> np.ndarray:
 
 def analyze_time_series(data: TimeSeriesInput) -> TimeSeriesStatistics:
     values, window = data.values, data.window
-    raise NotImplementedError  # TODO
+    mean = np.mean(values)
+    variance = np.var(values)
+    std = np.std(values)
+    local_maxima_indices = []
+    local_minima_indices = []
+
+    for i in range(1, len(values) - 1):
+        if values[i] > values[i - 1] and values[i] > values[i + 1]:
+            local_maxima_indices.append(i)
+        if values[i] < values[i - 1] and values[i] < values[i + 1]:
+            local_minima_indices.append(i)
+    moving_average = np.convolve(
+        values,
+        np.ones(window) / window,
+        mode="valid")
+    return TimeSeriesStatistics(
+        mean,
+        variance,
+        std,
+        local_maxima_indices,
+        local_minima_indices,
+        moving_average
+    )
 
 
 def one_hot(data: OneHotInput) -> np.ndarray:
