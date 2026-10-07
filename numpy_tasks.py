@@ -24,12 +24,20 @@ def binarize(data: BinarizeInput) -> np.ndarray:
 
 def unique_rows(data: MatrixInput) -> list[list[float]]:
     matrix = data.matrix
-    raise NotImplementedError  # TODO
+    result = []
 
+    for row in matrix:
+        result.append(np.unique(row).tolist())
 
+    return result
 def unique_columns(data: MatrixInput) -> list[list[float]]:
     matrix = data.matrix
-    raise NotImplementedError  # TODO
+    result = []
+
+    for column in matrix.T:
+        result.append(np.unique(column).tolist())
+
+    return result
 
 
 def matrix_statistics(data: RandomMatrixInput) -> MatrixStatistics:
