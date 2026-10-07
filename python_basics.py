@@ -30,7 +30,16 @@ def count_one_bits(data: PositiveIntegerInput) -> int:
 
 def multiplicative_persistence(data: PositiveIntegerInput) -> int:
     number = data.value
-    raise NotImplementedError  # TODO
+    steps = 0
+
+    while number >= 10:
+        product = 1
+
+        for digit in str(number):
+            product *= int(digit)
+        number = product
+        steps += 1
+    return steps
 
 
 def mse(data: VectorPairInput) -> float:
