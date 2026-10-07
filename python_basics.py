@@ -44,7 +44,14 @@ def multiplicative_persistence(data: PositiveIntegerInput) -> int:
 
 def mse(data: VectorPairInput) -> float:
     predicted, expected = data.predicted, data.expected
-    raise NotImplementedError  # TODO
+    total = 0
+
+    for i in range(len(predicted)):
+        difference = predicted[i] - expected[i]
+        total += difference ** 2
+
+    return total / len(predicted)
+
 
 
 def prime_factorization(data: PositiveIntegerInput) -> str:
