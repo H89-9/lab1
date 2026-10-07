@@ -74,14 +74,36 @@ def draw_rectangle(data: RectangleInput) -> np.ndarray:
     width, height = data.width, data.height
     image_height, image_width = data.image_height, data.image_width
     shape_color, background_color = data.shape_color, data.background_color
-    raise NotImplementedError  # TODO
+    image = np.full(
+        (image_height, image_width, 3),
+        background_color,
+        dtype=np.uint8)
 
+    start_x = (image_width - width) // 2
+    start_y = (image_height - height) // 2
+    end_x = start_x + width
+    end_y = start_y + height
+    image[start_y:end_y, start_x:end_x] = shape_color
+    return image
 
 def draw_ellipse(data: EllipseInput) -> np.ndarray:
     semi_axis_x, semi_axis_y = data.semi_axis_x, data.semi_axis_y
     image_height, image_width = data.image_height, data.image_width
     shape_color, background_color = data.shape_color, data.background_color
-    raise NotImplementedError  # TODO
+    image = np.full(
+        (image_height, image_width, 3),
+        background_color,
+        dtype=np.uint8)
+
+    center_x = (image_width - 1) / 2
+    center_y = (image_height - 1) / 2
+    y, x = np.ogrid[:image_height, :image_width]
+    ellipse = (
+        ((x - center_x) ** 2) / (semi_axis_x ** 2)
+        + ((y - center_y) ** 2) / (semi_axis_y ** 2)
+        <= 1)
+    image[ellipse] = shape_color
+    return image
 
 
 def analyze_time_series(data: TimeSeriesInput) -> TimeSeriesStatistics:
