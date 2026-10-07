@@ -76,7 +76,15 @@ def prime_factorization(data: PositiveIntegerInput) -> str:
 
 def pyramid(data: PositiveIntegerInput) -> int | str:
     cube_count = data.value
-    raise NotImplementedError  # TODO
+    total = 0
+    k = 0
+
+    while total < cube_count:
+        k += 1
+        total += k ** 2
+    if total == cube_count:
+        return k
+    return "It is impossible"
 
 
 def is_balanced_number(data: PositiveIntegerInput) -> bool:
