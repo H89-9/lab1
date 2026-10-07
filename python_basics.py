@@ -53,11 +53,26 @@ def mse(data: VectorPairInput) -> float:
     return total / len(predicted)
 
 
-
 def prime_factorization(data: PositiveIntegerInput) -> str:
     number = data.value
-    raise NotImplementedError  # TODO
+    divisor = 2
+    result = ""
 
+    while number > 1:
+        power = 0
+
+        while number % divisor == 0:
+            number //= divisor
+            power += 1
+
+        if power == 1:
+            result += f"({divisor})"
+        elif power > 1:
+            result += f"({divisor}**{power})"
+
+        divisor += 1
+    return result
+    
 
 def pyramid(data: PositiveIntegerInput) -> int | str:
     cube_count = data.value
