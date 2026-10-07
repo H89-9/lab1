@@ -135,4 +135,10 @@ def analyze_time_series(data: TimeSeriesInput) -> TimeSeriesStatistics:
 
 def one_hot(data: OneHotInput) -> np.ndarray:
     labels, class_count = data.labels, data.class_count
-    raise NotImplementedError  # TODO
+    if class_count is None:
+        class_count = int(np.max(labels)) + 1
+    result = np.zeros((len(labels), class_count), dtype=int)
+
+    for i, label in enumerate(labels):
+        result[i, label] = 1
+    return result
