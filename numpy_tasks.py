@@ -1,6 +1,7 @@
 """Заготовки задач на NumPy."""
 
 import numpy as np
+import matplotlib.pyplot as plt
 from grader_contracts.numpy_tasks import (
     BinarizeInput, ChessInput, EllipseInput, MatrixInput, MatrixStatistics,
     MatrixVectorBatchInput, OneHotInput, RandomMatrixInput, RectangleInput,
@@ -55,6 +56,22 @@ def matrix_statistics(data: RandomMatrixInput) -> MatrixStatistics:
         row_variances,
         column_variances
     )
+def plot_matrix_histograms(matrix):
+    for i, row in enumerate(matrix):
+        plt.figure()
+        plt.hist(row)
+        plt.title(f"Строка {i + 1}")
+        plt.xlabel("Значение")
+        plt.ylabel("Количество")
+        plt.show()
+
+    for i, column in enumerate(matrix.T):
+        plt.figure()
+        plt.hist(column)
+        plt.title(f"Столбец {i + 1}")
+        plt.xlabel("Значение")
+        plt.ylabel("Количество")
+        plt.show()
 
 
 def chess(data: ChessInput) -> np.ndarray:
